@@ -13,6 +13,7 @@ SUPPORT = "@KuyaGioPaldo"
 
 PH = timezone(timedelta(hours=8))
 
+# ---------------- ANTI-SPAM ----------------
 cooldown = {}
 
 def anti_spam(user_id):
@@ -22,40 +23,36 @@ def anti_spam(user_id):
     cooldown[user_id] = now
     return False
 
-# ---------------- PROVIDERS ----------------
-providers = ["JILI","PG","PRAGMATIC","FA CHAI","BNG","JDB","YELLOW BAT","CO9"]
-
-# ---------------- AUTO GENERATE 50 GAMES EACH ----------------
-def generate_games(prefix):
-    return [f"{prefix} GAME {i+1}" for i in range(50)]
+# ---------------- GAME DATA (50 EACH SAFE) ----------------
+def expand(base, prefix):
+    return base + [f"{prefix} Game {i+1}" for i in range(40)]
 
 games = {
-    "JILI": generate_games("JILI"),
-    "PG": generate_games("PG"),
-    "PRAGMATIC": generate_games("PRAG"),
-    "FA CHAI": generate_games("FCH"),
-    "BNG": generate_games("BNG"),
-    "JDB": generate_games("JDB"),
-    "YELLOW BAT": generate_games("YBAT"),
-    "CO9": generate_games("CO9")
+"JILI": expand(["Super Ace","Golden Empire","Boxing King","Crazy777","Money Coming"], "JILI"),
+"PG": expand(["Mahjong Ways 1","Mahjong Ways 2","Lucky Neko","Fortune Tiger","Dragon Hatch"], "PG"),
+"PRAGMATIC": expand(["Gates of Olympus","Sweet Bonanza","Sugar Rush","Big Bass","Wolf Gold"], "PRAG"),
+"FA CHAI": expand(["Fa Chai Fortune","Golden Monkey","Lucky Panda","Dragon Fortune"], "FCH"),
+"BNG": expand(["Book of Fortune","Bonanza Gold","Super Marble","Dragon Fishing"], "BNG"),
+"JDB": expand(["Dragon Hunter","Fire Phoenix","Money Bang Bang","Golden Disco"], "JDB"),
+"YELLOW BAT": expand(["Bat Frenzy","Golden Night Bat","Shadow Bat","Neon Rush"], "YBAT"),
+"CO9": expand(["CO9 Fortune","Golden Empire","Lucky Spin","Dragon Rise"], "CO9")
 }
 
-# ---------------- MENU ----------------
+providers = list(games.keys())
+
+# ---------------- UI MENU ----------------
 def menu():
-    buttons = []
-    row = []
-
-    for i, p in enumerate(providers):
-        row.append(InlineKeyboardButton(p, callback_data=p))
-
-        if len(row) == 2:
-            buttons.append(row)
-            row = []
-
-    if row:
-        buttons.append(row)
-
-    return InlineKeyboardMarkup(buttons)
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("🎰 JILI", callback_data="prov_JILI"),
+         InlineKeyboardButton("🎲 PG", callback_data="prov_PG")],
+        [InlineKeyboardButton("🔥 PRAGMAT", callback_data="prov_PRAGMATIC"),
+         InlineKeyboardButton("🧧 FA CHAI", callback_data="prov_FA CHAI")],
+        [InlineKeyboardButton("⚡ BNG", callback_data="prov_BNG"),
+         InlineKeyboardButton("🎮 JDB", callback_data="prov_JDB")],
+        [InlineKeyboardButton("🦇 YELLOW BAT", callback_data="prov_YELLOW BAT"),
+         InlineKeyboardButton("💎 CO9", callback_data="prov_CO9")],
+        [InlineKeyboardButton("🔍 SEARCH GAME", callback_data="search")]
+    ])
 
 # ---------------- TIME ----------------
 def get_time():
@@ -64,14 +61,27 @@ def get_time():
     end = start + timedelta(minutes=30)
     return f"{start.strftime('%I:%M %p')} - {end.strftime('%I:%M %p')}"
 
-# ---------------- START ----------------
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🎮 GOOD DAY BOSSING!\n\nSelect provider 👇",
-        reply_markup=menu()
-    )
+# ---------------- PAGINATION ----------------
+PER_PAGE = 10
 
-# ---------------- BUTTON ----------------
+def paginate(items, page):
+    start = page * PER_PAGE
+    end = start + PER_PAGE
+    return items[start:end], page
+
+def max_page(provider):
+    return len(games[provider]) // PER_PAGE
+
+# ---------------- START UI ----------------
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = (
+        "🎮 GOOD DAY BOSSING!\n\n"
+        "Gusto mo ba HourGuide ngayon?\n\n"
+        "👇 Pili ka provider"
+    )
+    await update.message.reply_text(text, reply_markup=menu())
+
+# ---------------- BUTTON HANDLER ----------------
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
@@ -79,19 +89,79 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if anti_spam(q.from_user.id):
         return
 
-    provider = q.data
+    data = q.data
 
-    if provider in games:
-        text = f"🎰 {provider}\n\n📘 {CANVA_LINK}\n📩 {SUPPORT}\n\n"
+    # ---------------- SEARCH MODE ----------------
+    if data == "search":
+        await q.edit_message_text("🔍 Send game name in chat.")
+        return
 
-        for g in games[provider]:
-            text += f"🎮 {g}\n🕐 {get_time()}\n👉 {CASINO_LINK}\n\n"
+    # ---------------- PROVIDER ----------------
+    if data.startswith("prov_"):
+        provider = data.replace("prov_", "")
+        page = 0
 
-        await q.edit_message_text(text, reply_markup=menu())
+        items, _ = paginate(games[provider], page)
+        maxp = max_page(provider)
 
-# ---------------- TEXT ----------------
+        msg = f"🌐 {CANVA_LINK}\n\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
+
+        for g in items:
+            msg += f"🎮 {g}\n🕐 {get_time()}\n👉 {CASINO_LINK}\n\n"
+
+        kb = [
+            [
+                InlineKeyboardButton("⬅️", callback_data=f"page_{provider}_{page-1}"),
+                InlineKeyboardButton(f"{page+1}/{maxp+1}", callback_data="noop"),
+                InlineKeyboardButton("➡️", callback_data=f"page_{provider}_{page+1}")
+            ],
+            [InlineKeyboardButton("🔄 Refresh", callback_data=f"prov_{provider}")],
+            [InlineKeyboardButton("🏠 Menu", callback_data="menu")]
+        ]
+
+        await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
+
+    # ---------------- PAGINATION ----------------
+    elif data.startswith("page_"):
+        _, provider, page = data.split("_")
+        page = int(page)
+
+        items, _ = paginate(games[provider], page)
+        maxp = max_page(provider)
+
+        msg = f"🌐 {CANVA_LINK}\n\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
+
+        for g in items:
+            msg += f"🎮 {g}\n🕐 {get_time()}\n👉 {CASINO_LINK}\n\n"
+
+        kb = [
+            [
+                InlineKeyboardButton("⬅️", callback_data=f"page_{provider}_{page-1}"),
+                InlineKeyboardButton(f"{page+1}/{maxp+1}", callback_data="noop"),
+                InlineKeyboardButton("➡️", callback_data=f"page_{provider}_{page+1}")
+            ],
+            [InlineKeyboardButton("🔄 Refresh", callback_data=f"prov_{provider}")],
+            [InlineKeyboardButton("🏠 Menu", callback_data="menu")]
+        ]
+
+        await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
+
+    elif data == "menu":
+        await q.edit_message_text("🏠 MAIN MENU", reply_markup=menu())
+
+# ---------------- SEARCH FUNCTION ----------------
 async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Use buttons only 👇", reply_markup=menu())
+    txt = update.message.text.lower()
+
+    for p in games:
+        for g in games[p]:
+            if txt in g.lower():
+                await update.message.reply_text(
+                    f"🎮 {g}\n🕐 {get_time()}\n👉 {CASINO_LINK}"
+                )
+                return
+
+    await update.message.reply_text("Game not found.", reply_markup=menu())
 
 # ---------------- RUN ----------------
 app = ApplicationBuilder().token(TOKEN).build()
