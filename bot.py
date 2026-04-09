@@ -1,5 +1,4 @@
 import random
-from datetime import date
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 
@@ -8,102 +7,113 @@ TOKEN = "8577695558:AAEm8ZtcjqYYPbqo576JlwNkmJrytYycb_g"
 CASINO_LINK = "http://kuyax333.paldopinas96.cc/?referralCode=opl5030"
 CANVA_LINK = "https://kuyagiometerguide.my.canva.site/"
 
-# All providers and all their games
+# 🔥 EXPANDED GAME LIST
 games = {
-    "JILI": ["Super Ace Deluxe", "Mega Ace", "Golden Empire", "Lucky Dragon"],
-    "PG": ["Mahjong Ways", "Lucky Neko", "Treasure Hunt", "Dragon Legend"],
-    "CQ9": ["Fire Phoenix", "Golden Rooster", "Fortune King", "Mystery Temple"],
-    "Pragmatic": ["Sweet Bonanza", "The Dog House", "Wild West Gold", "Great Rhino"]
+    "JILI": [
+        "Super Ace Deluxe","Mega Ace","Golden Empire","Lucky Dragon",
+        "Fortune Gems","Money Coming","Crazy FaFaFa","Golden Bank"
+    ],
+    "PG": [
+        "Mahjong Ways","Mahjong Ways 2","Lucky Neko","Treasure Hunt",
+        "Dragon Legend","Wild Bandito","Candy Burst","Fortune Tiger"
+    ],
+    "CQ9": [
+        "Fire Phoenix","Golden Rooster","Fortune King","Mystery Temple",
+        "Dragon Ball","Zeus","Jump High","God of War"
+    ],
+    "Pragmatic": [
+        "Sweet Bonanza","The Dog House","Wild West Gold","Great Rhino",
+        "Gates of Olympus","Starlight Princess","Big Bass Splash","Fruit Party"
+    ]
 }
 
-daily_data = {}
-saved_date = ""
 user_lang = {}
 
 # --- FUNCTIONS ---
-def gen_time(slot=None):
-    """Generate random time within a slot (Morning, Afternoon, Evening)"""
-    if slot == "Morning":
-        h = random.randint(8,11)
-    elif slot == "Afternoon":
-        h = random.randint(12,16)
-    elif slot == "Evening":
-        h = random.randint(17,21)
-    else:
-        h = random.randint(8,21)
+def gen_time():
+    h = random.randint(8, 21)
     m = random.choice([0,10,20,30,40,50])
-    me = m+20
+    me = m + 20
     if me >= 60:
         me -= 60
-        h +=1
-        if h>23:
-            h = h-24
-    p = "AM" if h<12 else "PM"
-    h12 = h if h<=12 else h-12
+        h += 1
+    p = "AM" if h < 12 else "PM"
+    h12 = h if h <= 12 else h - 12
     return f"{h12}:{m:02d} {p} - {h12}:{me:02d} {p}"
 
-def gen_daily():
-    """Generate daily times for all games in all providers"""
-    global daily_data
-    daily_data = {}
-    for provider, game_list in games.items():
-        daily_data[provider] = {}
-        for game in game_list:
-            slot = random.choice(["Morning","Afternoon","Evening"])
-            daily_data[provider][game] = gen_time(slot)
+def generate_provider(provider):
+    """Generate NEW times EVERY CLICK"""
+    data = {}
+    for game in games[provider]:
+        data[game] = gen_time()
+    return data
 
-def get_msg(provider,lang):
-    """Prepare the full guide message: Canva first, then all games"""
-    msg_lines = []
-    # Canva link first
-    msg_lines.append("🌐 MORE GUIDE IN HERE:\n" + CANVA_LINK)
-    msg_lines.append("")  # empty line
-    # Provider header
-    msg_lines.append(f"🎰 {provider} GUIDE 🎰" if lang=="EN" else f"🎰 {provider} ORAS NG LARO 🎰")
-    # List all games with their times and casino link
-    for game, time in daily_data[provider].items():
-        msg_lines.append(f"🎮 {game}\n🕐 {time}\n👉 {CASINO_LINK}")
-    return "\n\n".join(msg_lines)
+def get_msg(provider, lang, data):
+    msg = []
+    
+    # ✅ Canva FIRST
+    msg.append("🌐 MORE GUIDE IN HERE:\n" + CANVA_LINK)
+    msg.append("")
+    
+    msg.append(f"🎰 {provider} GUIDE 🎰" if lang=="EN" else f"🎰 {provider} ORAS NG LARO 🎰")
+    
+    for game, time in data.items():
+        msg.append(f"🎮 {game}\n🕐 {time}\n👉 {CASINO_LINK}")
+    
+    return "\n\n".join(msg)
 
-# --- TELEGRAM HANDLERS ---
-async def start(update:Update,context:ContextTypes.DEFAULT_TYPE):
+# --- HANDLERS ---
+async def start(update:Update, context:ContextTypes.DEFAULT_TYPE):
     uid = update.message.from_user.id
-    user_lang[uid] = None  # reset language each start
-    kb = [[InlineKeyboardButton("English",callback_data="lang_EN"),
-           InlineKeyboardButton("Tagalog",callback_data="lang_TL")]]
-    await update.message.reply_text("Choose your language / Piliin ang wika:",reply_markup=InlineKeyboardMarkup(kb))
+    user_lang[uid] = None
 
-async def button(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    kb = [[
+        InlineKeyboardButton("English", callback_data="lang_EN"),
+        InlineKeyboardButton("Tagalog", callback_data="lang_TL")
+    ]]
+    
+    await update.message.reply_text(
+        "Choose your language / Piliin ang wika:",
+        reply_markup=InlineKeyboardMarkup(kb)
+    )
+
+async def button(update:Update, context:ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
+    
     data = q.data
     uid = q.from_user.id
-    global saved_date
-
-    today = str(date.today())
-    if today != saved_date:
-        gen_daily()
-        saved_date = today
 
     if data.startswith("lang_"):
         user_lang[uid] = data.split("_")[1]
-        kb = [[InlineKeyboardButton(p,callback_data=f"prov_{p}")] for p in games.keys()]
-        await q.edit_message_text("Select provider:" if user_lang[uid]=="EN" else "Pumili ng provider:",
-                                  reply_markup=InlineKeyboardMarkup(kb))
+
+        kb = [[InlineKeyboardButton(p, callback_data=f"prov_{p}")] for p in games.keys()]
+        
+        await q.edit_message_text(
+            "Select provider:" if user_lang[uid]=="EN" else "Pumili ng provider:",
+            reply_markup=InlineKeyboardMarkup(kb)
+        )
+
     elif data.startswith("prov_"):
         prov = data.split("_")[1]
-        lang = user_lang.get(uid,"EN")
-        msg = get_msg(prov,lang)
-        # HourGuide button lets user refresh the provider
-        kb = [[InlineKeyboardButton("HourGuide 🔄",callback_data=f"prov_{prov}")]]
-        await q.edit_message_text(msg,reply_markup=InlineKeyboardMarkup(kb))
+        lang = user_lang.get(uid, "EN")
 
-async def text(update:Update,context:ContextTypes.DEFAULT_TYPE):
+        # 🔥 FIX: Generate NEW DATA EVERY CLICK
+        provider_data = generate_provider(prov)
+
+        msg = get_msg(prov, lang, provider_data)
+
+        kb = [[InlineKeyboardButton("HourGuide 🔄", callback_data=f"prov_{prov}")]]
+
+        await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
+
+async def text(update:Update, context:ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Please use /start to begin.")
 
 # --- MAIN ---
 app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(CommandHandler("start",start))
+app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,text))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text))
+
 app.run_polling()
