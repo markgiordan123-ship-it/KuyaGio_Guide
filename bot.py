@@ -1,22 +1,25 @@
+import os
 import random
 from datetime import datetime, timedelta, timezone
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 
-# ---------------- CONFIG ----------------
-TOKEN = "YOUR_BOT_TOKEN"
+# ---------------- TOKEN (USE RAILWAY VARIABLE) ----------------
+TOKEN = os.getenv("TOKEN")
+
+# ---------------- LINKS ----------------
 CASINO_LINK = "http://kuyax333.paldopinas96.cc/?referralCode=opl5030"
 CANVA_LINK = "https://kuyagiometerguide.my.canva.site/"
 SUPPORT = "@KuyaGioPaldo"
 
 PH = timezone(timedelta(hours=8))
 
-# ---------------- GAME DATA ----------------
+# ---------------- PROVIDERS ----------------
 games = {
     "JILI": [
         "SUPER ACE","GOLDEN EMPIRE","BOXING KING","CRAZY777","MONEY COMING",
         "LUCKY JAGUAR","FORTUNE GEMS","WILD ACE","GOLDEN BANK 2","ZEUS",
-        "SUPER ACE DELUXE","FA FA FA","SEVEN SEVEN SEVEN","MONEY POT"
+        "SUPER ACE DELUXE","FA FA FA","MONEY POT","SEVEN SEVEN SEVEN"
     ],
     "PG": [
         "Mahjong Ways","Mahjong Ways 2","Lucky Neko","Fortune Tiger",
@@ -26,7 +29,7 @@ games = {
     "PRAGMATIC": [
         "Sweet Bonanza","Gates of Olympus","Starlight Princess",
         "Wild West Gold","Fruit Party","Big Bass Splash","Wolf Gold",
-        "Sugar Rush","Hot Fiesta","Chilli Heat","Buffalo King"
+        "Sugar Rush","Hot Fiesta","Buffalo King"
     ],
     "FA CHAI": [
         "Fa Chai Riches","Golden Monkey","Lucky Twins",
@@ -34,16 +37,9 @@ games = {
     ]
 }
 
-# ---------------- CACHE (IMPORTANT FIX) ----------------
-# stores stable results per game
+# ---------------- CACHE (STABLE TIME SYSTEM) ----------------
 game_cache = {}
 
-# expiration per game type (minutes)
-game_duration = {
-    "default": 30
-}
-
-# ---------------- TIME GENERATOR (PH TIME) ----------------
 def generate_time():
     now = datetime.now(PH)
 
@@ -55,17 +51,14 @@ def generate_time():
 
     return start, end
 
-# ---------------- GET STABLE GAME TIME ----------------
 def get_game_time(game):
     now = datetime.now(PH)
 
     if game in game_cache:
-        entry = game_cache[game]
-        if now < entry["expires"]:
-            return entry["text"]
+        if now < game_cache[game]["expires"]:
+            return game_cache[game]["text"]
 
     start, end = generate_time()
-
     text = f"{start.strftime('%I:%M %p')} - {end.strftime('%I:%M %p')}"
 
     game_cache[game] = {
@@ -75,44 +68,41 @@ def get_game_time(game):
 
     return text
 
-# ---------------- GENERATE PROVIDER DATA ----------------
-def generate_provider(provider):
+# ---------------- BUILD PROVIDER DATA ----------------
+def build_provider(provider):
     shuffled = games[provider][:]
     random.shuffle(shuffled)
-
     return {g: get_game_time(g) for g in shuffled}
 
 # ---------------- PAGINATION ----------------
-def paginate(items, page=0, per_page=10):
-    items = list(items.items())
-    start = page * per_page
-    end = start + per_page
-    total_pages = (len(items) + per_page - 1) // per_page
-    return items[start:end], total_pages
+def paginate(data, page, per_page=10):
+    items = list(data.items())
+    total = (len(items) + per_page - 1) // per_page
+    return items[page*per_page:(page+1)*per_page], total
 
-# ---------------- MESSAGE BUILDER ----------------
+# ---------------- UI MESSAGE ----------------
 def build_message(provider, data, page):
-    chunk, total_pages = paginate(data, page)
+    chunk, total = paginate(data, page)
 
     msg = []
     msg.append("🌐 MORE GUIDE IN HERE:\n" + CANVA_LINK)
-    msg.append(f"📩 NEED HELP? {SUPPORT}")
-    msg.append("⚠️ FOR PALDOPINAS USERS ONLY!\n")
-    msg.append(f"🎰 {provider} PROVIDER 🎰\n")
+    msg.append(f"📩 SUPPORT: {SUPPORT}")
+    msg.append("⚠️ FOR PHILIPPINES USERS ONLY\n")
+    msg.append(f"🎰 {provider} PROVIDER GUIDE\n")
 
     for g, t in chunk:
         msg.append(f"🎮 {g}\n🕐 {t}\n👉 {CASINO_LINK}\n")
 
-    msg.append(f"📄 Page {page+1}/{total_pages}")
+    msg.append(f"📄 Page {page+1}/{total}")
 
-    return "\n".join(msg), total_pages
+    return "\n".join(msg), total
 
 # ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    kb = [
-        [InlineKeyboardButton("English", callback_data="lang_EN"),
-         InlineKeyboardButton("Tagalog", callback_data="lang_TL")]
-    ]
+    kb = [[
+        InlineKeyboardButton("English", callback_data="lang_EN"),
+        InlineKeyboardButton("Tagalog", callback_data="lang_TL")
+    ]]
     await update.message.reply_text("Choose language:", reply_markup=InlineKeyboardMarkup(kb))
 
 # ---------------- BUTTON HANDLER ----------------
@@ -128,13 +118,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("prov_"):
         provider = data.split("_")[1]
 
-        data_map = generate_provider(provider)
-        msg, total_pages = build_message(provider, data_map, 0)
+        data_map = build_provider(provider)
+        msg, total = build_message(provider, data_map, 0)
 
         kb = [
-            [InlineKeyboardButton(str(i+1), callback_data=f"page_{provider}_{i}") for i in range(total_pages)],
-            [InlineKeyboardButton("HourGuide 🔄", callback_data=f"prov_{provider}")],
-            [InlineKeyboardButton("Change Provider 🔘", callback_data="back")]
+            [InlineKeyboardButton(str(i+1), callback_data=f"page_{provider}_{i}") for i in range(total)],
+            [InlineKeyboardButton("🔄 Refresh HourGuide", callback_data=f"prov_{provider}")],
+            [InlineKeyboardButton("🔙 Back", callback_data="back")]
         ]
 
         await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
@@ -143,13 +133,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         _, provider, page = data.split("_")
         page = int(page)
 
-        data_map = generate_provider(provider)
-        msg, total_pages = build_message(provider, data_map, page)
+        data_map = build_provider(provider)
+        msg, total = build_message(provider, data_map, page)
 
         kb = [
-            [InlineKeyboardButton(str(i+1), callback_data=f"page_{provider}_{i}") for i in range(total_pages)],
-            [InlineKeyboardButton("HourGuide 🔄", callback_data=f"prov_{provider}")],
-            [InlineKeyboardButton("Change Provider 🔘", callback_data="back")]
+            [InlineKeyboardButton(str(i+1), callback_data=f"page_{provider}_{i}") for i in range(total)],
+            [InlineKeyboardButton("🔄 Refresh HourGuide", callback_data=f"prov_{provider}")],
+            [InlineKeyboardButton("🔙 Back", callback_data="back")]
         ]
 
         await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
@@ -174,6 +164,7 @@ async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ---------------- MAIN ----------------
 app = ApplicationBuilder().token(TOKEN).build()
+
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text))
