@@ -53,12 +53,16 @@ def gen_daily():
             daily_data[provider][game] = gen_time(slot)
 
 def get_msg(provider,lang):
-    """Prepare the full guide message for all games in the provider"""
+    """Prepare the full guide message: Canva first, then all games"""
     msg_lines = []
+    # Canva link first
+    msg_lines.append("🌐 MORE GUIDE IN HERE:\n" + CANVA_LINK)
+    msg_lines.append("")  # empty line
+    # Provider header
     msg_lines.append(f"🎰 {provider} GUIDE 🎰" if lang=="EN" else f"🎰 {provider} ORAS NG LARO 🎰")
+    # List all games with their times and casino link
     for game, time in daily_data[provider].items():
         msg_lines.append(f"🎮 {game}\n🕐 {time}\n👉 {CASINO_LINK}")
-    msg_lines.append("\n🌐 MORE GUIDE IN HERE:\n" + CANVA_LINK)
     return "\n\n".join(msg_lines)
 
 # --- TELEGRAM HANDLERS ---
