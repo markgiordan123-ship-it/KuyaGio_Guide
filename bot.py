@@ -14,71 +14,98 @@ SUPPORT = "@KuyaGioPaldo"
 
 PH = timezone(timedelta(hours=8))
 
-# ---------------- PROVIDERS ----------------
+# ---------------- CONFIG ----------------
+PER_PAGE = 10
+
+# ---------------- FULL GAME DATABASE (50 EACH) ----------------
 games = {
 
 "JILI": [
 "SUPER ACE","GOLDEN EMPIRE","BOXING KING","CRAZY777","MONEY COMING",
-"LUCKY JAGUAR","FORTUNE GEMS","WILD ACE","GOLDEN BANK 2","SHANGHAI BEAUTY",
-"ZEUS","SUPER ACE DELUXE","MONEY POT","FA FA FA","JUNGLE KING","NEKO FORTUNE"
+"LUCKY JAGUAR","SHANGHAI BEAUTY","FORTUNE GEMS","WILD ACE","GOLDEN BANK 2",
+"Shōgun","3 LUCKY PIGS","3 COIN TREASURES","NIGHTFALL HUNTING","MONEY POT",
+"FRUITY WHEEL","AZTEC PRIESTESS","BANGLA BEAUTY","GO FOR CHAMPION","EGYPT GLOW",
+"MAGIC LAMP","NIGHT CITY","LEGACY OF EGYPT","PIRATE QUEEN","GOLDEN TEMPLE",
+"JACKPOT JOKER","CANDY BABY","MINES GOLD","LUCKY GOLDBRICKS","BONUS HUNTER",
+"PARTY STAR","KING ARTHUR","WAR DRAGONS","BOOK OF GOLD","SWEET LAND",
+"BOXING EXTRAVAGANZA","SIN CITY","PHARAOH TREASURE","WITCHES NIGHT","ARENA FIGHTER",
+"LUCKY DOGGY","FORTUNE TREE","BONE FORTUNE","GOLDEN QUEEN","MASTER TIGER",
+"JUNGLE KING","SAMBA","GOLDEN JOKER","NEKO FORTUNE","ELF BINGO"
 ],
 
 "PG": [
-"Mahjong Ways","Mahjong Ways 2","Lucky Neko","Fortune Tiger","Fortune Ox",
-"Dragon Hatch","Ganesha Gold","Wild Bandito","Treasures of Aztec","Medusa",
-"Rise of Apollo","Flirting Scholar","Reel Love","Alchemy Gold","Diner Frenzy",
-"Garuda Gems","Speed Winner","Dreams of Macau","Emoji Riches","Phoenix Rises"
+"Mahjong Ways","Mahjong Ways 2","Mahjong Ways 3","Lucky Neko","Fortune Tiger",
+"Fortune Ox","Fortune Rabbit","Fortune Mouse","Dragon Hatch","Dragon Hatch 2",
+"Ganesha Gold","Wild Bandito","Treasures of Aztec","Symbols of Egypt","Rise of Apollo",
+"Medusa","Medusa II","Flirting Scholar","Reel Love","Bali Vacation",
+"Circus Delight","Plushie Frenzy","Jewels of Prosperity","Opera Dynasty","Heist Stakes",
+"Legend of Perseus","Ways of the Qilin","Shaolin Soccer","Hip Hop Panda","Garuda Gems",
+"Muay Thai Champion","Mr Hallow-Win","Speed Winner","Alchemy Gold","Dreams of Macau",
+"Fortune Gods","Diner Frenzy","Crypto Gold","Emoji Riches","Phoenix Rises",
+"Santa’s Gift Rush","Win Win Won","Bikini Paradise","Safari Wilds","Jurassic Kingdom",
+"Golden Genie","Lucky Piggy","Mermaid Riches","Dragon Fortune","Wild Safari"
 ],
 
 "PRAGMATIC": [
-"Sweet Bonanza","Gates of Olympus","Starlight Princess","Sugar Rush",
-"Wild West Gold","Big Bass Splash","Big Bass Bonanza","Wolf Gold","Buffalo King",
-"Fruit Party","Madame Destiny","Release the Kraken","5 Lions Megaways",
-"Extra Juicy","Cash Patrol","Hot Fiesta","Chilli Heat","Neon Staxx","Fire Strike"
+"Sweet Bonanza","Gates of Olympus","Starlight Princess","Sugar Rush","Wild West Gold",
+"Big Bass Splash","Big Bass Bonanza","Wolf Gold","Buffalo King","Fruit Party",
+"Madame Destiny","Release the Kraken","5 Lions Megaways","Extra Juicy","Cash Patrol",
+"Hot Fiesta","Chilli Heat","Neon Staxx","Fire Strike","Diamond Strike",
+"Ultra Burn","Treasure Wild","Sea of Riches","Vegas Magic","Mystic Fortune",
+"Power of Thor","Great Rhino","Aztec Gems","The Dog House","Zombie Carnival",
+"Fruit Party 2","Gates of Olympus 1000","Sweet Bonanza Xmas","Sugar Rush 1000",
+"Buffalo King Megaways","Wild West Duels","Big Bass Hold Spin","Book of Dead",
+"Fire Joker","Lucky Lightning","Super X","Gold Train","Golden Explorer",
+"Hot Safari","Mega Wheel","Space Gem","Tropical Wilds","Cash Elevator"
 ],
 
 "FA CHAI": [
 "Fa Chai Riches","Golden Monkey","Lucky Twins","Dragon Treasure","Fortune Festival",
 "God of Wealth","Golden Panda","Lucky Koi","Prosperity Lion","Five Dragons",
-"Dragon King","Money Tree","Golden Dragon","Lucky Lantern","Red Envelope"
+"Dragon King","Fu Lu Shou","Fortune Ox","Golden Dragon","Lucky Fortune Cat",
+"Chinese New Year","Money Tree","Blessed Fortune","Golden Year","Red Envelope",
+"Fortune Panda","Lucky Lantern","Imperial Wealth","Jade Emperor","Golden Zodiac",
+"Prosperity Gate","Wealth God","Lucky Spring","Dragon Blessing","Fortune Coins",
+"Golden Fireworks","Royal Fortune","China Gold","Lucky Empire","Fortune Heaven",
+"Golden Dynasty","Lucky Palace","Dragon Gold","Wealth Fortune","Prosperity Luck",
+"Golden Prosperity","Fortune Temple","Lucky Emperor","Dragon Blessing 2","Golden Blessing"
 ],
 
-# ---------------- NEW PROVIDERS YOU REQUESTED ----------------
-
 "BNG": [
-"Bonanza Gold","Book of Fortune","Super Marble","Legendary Monkey",
-"Shark Hunter","Dragon Power Flame","Wild Tundra","Golden Empire BNG",
-"Treasure Island","Ocean King","Super Bingo","Lucky Wheel BNG",
-"Fishing Mania","Dragon Fishing","Fortune Cat BNG","Mega Spin",
-"Fire Rooster","Golden Dragon BNG","Lucky Panda","Fortune House"
+"Bonanza Gold","Book of Fortune","Super Marble","Legendary Monkey","Shark Hunter",
+"Dragon Power Flame","Wild Tundra","Golden Empire BNG","Treasure Island","Ocean King",
+"Super Bingo","Lucky Wheel BNG","Fishing Mania","Dragon Fishing","Fortune Cat BNG",
+"Mega Spin","Fire Rooster","Golden Dragon BNG","Lucky Panda","Fortune House",
+"Ocean Treasure","Deep Sea King","Wild Catch","Fish Hunter","Golden Fishing",
+"Jackpot Fishing","Lucky Ocean","Sea Monster","Mega Fishing","Treasure Catch"
 ],
 
 "JDB": [
-"Dragon Hunter","Fire Phoenix","Money Bang Bang","Fortune Mouse JDB",
-"Golden Disco","Candy Burst JDB","Jungle Treasure","Lucky Phoenix",
-"Super Kids","Piggy Bank JDB","Golden Shark","Dragon King JDB",
-"Fortune Tree JDB","Lucky Star","JDB Fishing","Hot Spin",
-"Crazy Money","Golden Rooster","Super Dragon","Fortune Island"
+"Dragon Hunter","Fire Phoenix","Money Bang Bang","Fortune Mouse JDB","Golden Disco",
+"Candy Burst JDB","Jungle Treasure","Lucky Phoenix","Super Kids","Piggy Bank JDB",
+"Golden Shark","Dragon King JDB","Fortune Tree JDB","Lucky Star","JDB Fishing",
+"Hot Spin","Crazy Money","Golden Rooster","Super Dragon","Fortune Island",
+"Neon Party","Lucky Spin JDB","Mega Boom","Power Win","Golden Rush"
 ],
 
 "YELLOW BAT": [
-"Yellow Bat Riches","Bat Frenzy","Golden Night Bat","Shadow Bat",
-"Vampire Bat Gold","Lucky Bat Empire","Bat Treasure","Midnight Bat",
-"Golden Cave Bat","Bat King","Dark Bat Fortune","Bat Storm",
-"Neon Bat Rush","Lucky Wing Bat","Bat Jackpot","Golden Wing",
-"Night Hunter Bat","Bat Galaxy","Shadow Fortune Bat","Mega Bat Spin"
+"Yellow Bat Riches","Bat Frenzy","Golden Night Bat","Shadow Bat","Vampire Bat Gold",
+"Lucky Bat Empire","Bat Treasure","Midnight Bat","Golden Cave Bat","Bat King",
+"Dark Bat Fortune","Bat Storm","Neon Bat Rush","Lucky Wing Bat","Bat Jackpot",
+"Golden Wing","Night Hunter Bat","Bat Galaxy","Shadow Fortune Bat","Mega Bat Spin",
+"Sky Bat","Thunder Bat","Crystal Bat","Moon Bat","Dark Wing"
 ],
 
 "CO9": [
-"CO9 Fortune","CO9 Golden Empire","CO9 Lucky Spin","CO9 Dragon Rise",
-"CO9 Money Train","CO9 Jungle King","CO9 Mega Jackpot","CO9 Fire Wheel",
-"CO9 Treasure Box","CO9 Wild Gold","CO9 Lucky Panda","CO9 Ocean Spin",
-"CO9 Fortune Tiger","CO9 Gold Rush","CO9 Neon Luck","CO9 Super Spin",
-"CO9 Dragon Gold","CO9 Crystal Win","CO9 Lucky Kingdom","CO9 Mega Win"
+"CO9 Fortune","CO9 Golden Empire","CO9 Lucky Spin","CO9 Dragon Rise","CO9 Money Train",
+"CO9 Jungle King","CO9 Mega Jackpot","CO9 Fire Wheel","CO9 Treasure Box","CO9 Wild Gold",
+"CO9 Lucky Panda","CO9 Ocean Spin","CO9 Fortune Tiger","CO9 Gold Rush","CO9 Neon Luck",
+"CO9 Super Spin","CO9 Dragon Gold","CO9 Crystal Win","CO9 Lucky Kingdom","CO9 Mega Win",
+"CO9 Power Spin","CO9 Lucky Storm","CO9 Golden Rush","CO9 Ultra Win","CO9 Sky Jackpot"
 ]
 }
 
-# ---------------- CACHE ----------------
+# ---------------- CACHE (ANTI LAG CORE) ----------------
 cache = {}
 
 def gen_time():
@@ -90,15 +117,16 @@ def gen_time():
 def get_time(game):
     now = datetime.now(PH)
 
-    if game in cache and now < cache[game]["expires"]:
-        return cache[game]["text"]
+    if game in cache:
+        if now < cache[game]["expire"]:
+            return cache[game]["text"]
 
     s, e = gen_time()
     text = f"{s.strftime('%I:%M %p')} - {e.strftime('%I:%M %p')}"
 
     cache[game] = {
         "text": text,
-        "expires": now + timedelta(minutes=30)
+        "expire": now + timedelta(minutes=30)
     }
 
     return text
@@ -109,9 +137,19 @@ def build(provider):
     random.shuffle(lst)
     return {g: get_time(g) for g in lst}
 
-# ---------------- MAIN MENU (APP UI STYLE) ----------------
-def main_menu():
-    kb = [
+# ---------------- PAGINATION ----------------
+def paginate(items, page):
+    items = list(items.items())
+    start = page * PER_PAGE
+    end = start + PER_PAGE
+    return items[start:end]
+
+def max_page(provider):
+    return (len(games[provider]) - 1) // PER_PAGE
+
+# ---------------- UI ----------------
+def menu():
+    return InlineKeyboardMarkup([
         [InlineKeyboardButton("🎰 JILI", callback_data="prov_JILI"),
          InlineKeyboardButton("🎲 PG", callback_data="prov_PG")],
 
@@ -123,16 +161,15 @@ def main_menu():
 
         [InlineKeyboardButton("🦇 YELLOW BAT", callback_data="prov_YELLOW BAT"),
          InlineKeyboardButton("💎 CO9", callback_data="prov_CO9")]
-    ]
-    return InlineKeyboardMarkup(kb)
+    ])
 
 # ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = (
         "🎮 GOOD DAY BOSSING!\n\n"
-        "Gusto mo ba malaman ang HourGuide ngayon?\n\n"
-        "👇 Pili ka ng language"
+        "Gusto mo ba HourGuide ngayon?\n\n"
+        "👇 Pili ka language"
     )
 
     kb = [[
@@ -142,40 +179,70 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(kb))
 
-# ---------------- BUTTONS ----------------
+# ---------------- HANDLER ----------------
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
     data = q.data
 
-    # LANGUAGE -> MAIN MENU
+    # language -> menu
     if data.startswith("lang_"):
-        await q.edit_message_text("🏠 MAIN MENU\nChoose Provider:", reply_markup=main_menu())
+        await q.edit_message_text("🏠 MAIN MENU", reply_markup=menu())
 
-    # PROVIDER
+    # provider
     elif data.startswith("prov_"):
         provider = data.replace("prov_", "")
+        page = 0
+
         data_map = build(provider)
+        page_items = paginate(data_map, page)
+        maxp = max_page(provider)
 
-        msg = (
-            f"🌐 MORE GUIDE:\n{CANVA_LINK}\n\n"
-            f"📩 SUPPORT: {SUPPORT}\n"
-            f"🎰 {provider} PROVIDER\n\n"
-        )
+        msg = f"🌐 {CANVA_LINK}\n\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
 
-        for g, t in list(data_map.items())[:10]:
+        for g, t in page_items:
             msg += f"🎮 {g}\n🕐 {t}\n👉 {CASINO_LINK}\n\n"
 
         kb = [
+            [
+                InlineKeyboardButton("⬅️", callback_data=f"page_{provider}_{max(0,page-1)}"),
+                InlineKeyboardButton(f"{page+1}/{maxp+1}", callback_data="noop"),
+                InlineKeyboardButton("➡️", callback_data=f"page_{provider}_{page+1}")
+            ],
             [InlineKeyboardButton("🔄 Refresh", callback_data=f"prov_{provider}")],
-            [InlineKeyboardButton("🏠 Back to Menu", callback_data="back")]
+            [InlineKeyboardButton("🏠 Menu", callback_data="menu")]
         ]
 
         await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
 
-    # BACK
-    elif data == "back":
-        await q.edit_message_text("🏠 MAIN MENU\nChoose Provider:", reply_markup=main_menu())
+    # pagination
+    elif data.startswith("page_"):
+        _, provider, page = data.split("_")
+        page = int(page)
+
+        data_map = build(provider)
+        page_items = paginate(data_map, page)
+        maxp = max_page(provider)
+
+        msg = f"🌐 {CANVA_LINK}\n\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
+
+        for g, t in page_items:
+            msg += f"🎮 {g}\n🕐 {t}\n👉 {CASINO_LINK}\n\n"
+
+        kb = [
+            [
+                InlineKeyboardButton("⬅️", callback_data=f"page_{provider}_{max(0,page-1)}"),
+                InlineKeyboardButton(f"{page+1}/{maxp+1}", callback_data="noop"),
+                InlineKeyboardButton("➡️", callback_data=f"page_{provider}_{page+1}")
+            ],
+            [InlineKeyboardButton("🔄 Refresh", callback_data=f"prov_{provider}")],
+            [InlineKeyboardButton("🏠 Menu", callback_data="menu")]
+        ]
+
+        await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
+
+    elif data == "menu":
+        await q.edit_message_text("🏠 MAIN MENU", reply_markup=menu())
 
 # ---------------- SEARCH ----------------
 async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
