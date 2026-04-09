@@ -143,14 +143,4 @@ def menu():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("JILI", callback_data="JILI"),
          InlineKeyboardButton("PG", callback_data="PG")],
-        [InlineKeyboardButton("PRAGMATIC              return
-
-    await update.message.reply_text("Game not found.", reply_markup=menu())
-
-# ---------------- RUN ----------------
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CallbackQueryHandler(button))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text))
-
-app.run_polling()
+        [InlineKeyboardButton("PRAGMATIC
