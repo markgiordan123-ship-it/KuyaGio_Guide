@@ -1,13 +1,15 @@
 import os
-import random
 import time
+import random
 from datetime import datetime, timedelta, timezone
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 
+# ---------------- TOKEN ----------------
 TOKEN = os.getenv("TOKEN")
 
-CANVA_LINK = "https://kuyagiometerguide.my.canva.site/"
+# ---------------- LINKS ----------------
+CANVA_LINK = "https://canva.link/dgozj81g7d4zl7j"
 CASINO_LINK = "https://example.com"
 SUPPORT = "@KuyaGioPaldo"
 
@@ -23,35 +25,73 @@ def anti_spam(user_id):
     cooldown[user_id] = now
     return False
 
-# ---------------- GAME DATA (50 EACH SAFE) ----------------
-def expand(base, prefix):
-    return base + [f"{prefix} Game {i+1}" for i in range(40)]
-
+# ---------------- REAL GAMES ----------------
 games = {
-"JILI": expand(["Super Ace","Golden Empire","Boxing King","Crazy777","Money Coming"], "JILI"),
-"PG": expand(["Mahjong Ways 1","Mahjong Ways 2","Lucky Neko","Fortune Tiger","Dragon Hatch"], "PG"),
-"PRAGMATIC": expand(["Gates of Olympus","Sweet Bonanza","Sugar Rush","Big Bass","Wolf Gold"], "PRAG"),
-"FA CHAI": expand(["Fa Chai Fortune","Golden Monkey","Lucky Panda","Dragon Fortune"], "FCH"),
-"BNG": expand(["Book of Fortune","Bonanza Gold","Super Marble","Dragon Fishing"], "BNG"),
-"JDB": expand(["Dragon Hunter","Fire Phoenix","Money Bang Bang","Golden Disco"], "JDB"),
-"YELLOW BAT": expand(["Bat Frenzy","Golden Night Bat","Shadow Bat","Neon Rush"], "YBAT"),
-"CO9": expand(["CO9 Fortune","Golden Empire","Lucky Spin","Dragon Rise"], "CO9")
+"JILI": [
+"Super Ace","Golden Empire","Boxing King","Crazy777","Money Coming","Lucky Jaguar",
+"Fortune Gems","Wild Ace","Golden Bank 2","Shōgun","3 Lucky Pigs","3 Coin Treasures",
+"Nightfall Hunting","Money Pot","Fruity Wheel","Aztec Priestess","Bangla Beauty",
+"Go For Champion","Egypt Glow","Magic Lamp","Night City","Legacy of Egypt",
+"Pirate Queen","Golden Temple","Jackpot Joker","Candy Baby","Mines Gold",
+"Lucky Goldbricks","Bonus Hunter","Party Star","King Arthur","War Dragons",
+"Book of Gold","Sweet Land","Boxing Extravaganza","Sin City","Golden Bank",
+"Pharaoh Treasure","Witches Night","Arena Fighter","Lucky Doggy","Fortune Tree",
+"Bone Fortune","Golden Queen","Master Tiger","Jungle King","Samba","Golden Joker"
+],
+
+"PG": [
+"Mahjong Ways 1","Mahjong Ways 2","Lucky Neko","Fortune Tiger","Dragon Hatch",
+"Wild Bandito","Treasures of Aztec","Ganesha Gold","Medusa","Symbol of Egypt",
+"Hood vs Wolf","Rooster Rumble","Win Win Fish","Garuda Gems","Bikini Paradise",
+"Double Fortune","Crypto Gold","Dragon Legend","Candy Burst","Phoenix Rises"
+],
+
+"PRAGMATIC": [
+"Gates of Olympus","Sweet Bonanza","Sugar Rush","Big Bass Bonanza","Wolf Gold",
+"The Dog House","Wild West Gold","Buffalo King","Madame Destiny","Fire Strike",
+"Aztec Gems","John Hunter","Release the Kraken","Hot Safari","Extra Juicy"
+],
+
+"FA CHAI": [
+"Fa Chai Fortune","Golden Monkey","Lucky Panda","Dragon Fortune","Money Tree",
+"Fortune Festival","Golden Dragon","Lucky Coins","Red Packet Rush","Oriental Gold"
+],
+
+"BNG": [
+"Book of Fortune","Bonanza Gold","Super Marble","Dragon Fishing","Ocean King",
+"Shark Hunter","Fire Rooster","Treasure Island","Lucky Fishing","Golden Crab"
+],
+
+"JDB": [
+"Dragon Hunter","Fire Phoenix","Money Bang Bang","Golden Disco","Candy Burst",
+"Super Dragon","Hot Spin","Fortune Island","Mega Spin","Golden Boom"
+],
+
+"YELLOW BAT": [
+"Bat Frenzy","Golden Night Bat","Shadow Bat","Neon Bat Rush","Vampire Bat Gold",
+"Midnight Bat","Bat King","Lucky Bat Empire","Dark Wing","Night Hunter"
+],
+
+"CO9": [
+"CO9 Fortune","Golden Empire CO9","Lucky Spin CO9","Dragon Rise CO9",
+"Money Train CO9","Wild Gold CO9","Mega Win CO9","Fire Wheel CO9","CO9 Blast"
+]
 }
 
 providers = list(games.keys())
 
-# ---------------- UI MENU ----------------
+# ---------------- MENU ----------------
 def menu():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎰 JILI", callback_data="prov_JILI"),
-         InlineKeyboardButton("🎲 PG", callback_data="prov_PG")],
-        [InlineKeyboardButton("🔥 PRAGMAT", callback_data="prov_PRAGMATIC"),
-         InlineKeyboardButton("🧧 FA CHAI", callback_data="prov_FA CHAI")],
-        [InlineKeyboardButton("⚡ BNG", callback_data="prov_BNG"),
-         InlineKeyboardButton("🎮 JDB", callback_data="prov_JDB")],
-        [InlineKeyboardButton("🦇 YELLOW BAT", callback_data="prov_YELLOW BAT"),
-         InlineKeyboardButton("💎 CO9", callback_data="prov_CO9")],
-        [InlineKeyboardButton("🔍 SEARCH GAME", callback_data="search")]
+        [InlineKeyboardButton("🎰 JILI", callback_data="JILI"),
+         InlineKeyboardButton("🎲 PG", callback_data="PG")],
+        [InlineKeyboardButton("🔥 PRAGMATIC", callback_data="PRAGMATIC"),
+         InlineKeyboardButton("🧧 FA CHAI", callback_data="FA CHAI")],
+        [InlineKeyboardButton("⚡ BNG", callback_data="BNG"),
+         InlineKeyboardButton("🎮 JDB", callback_data="JDB")],
+        [InlineKeyboardButton("🦇 YELLOW BAT", callback_data="YELLOW BAT"),
+         InlineKeyboardButton("💎 CO9", callback_data="CO9")],
+        [InlineKeyboardButton("🔍 SEARCH", callback_data="search")]
     ])
 
 # ---------------- TIME ----------------
@@ -70,16 +110,14 @@ def paginate(items, page):
     return items[start:end], page
 
 def max_page(provider):
-    return len(games[provider]) // PER_PAGE
+    return (len(games[provider]) - 1) // PER_PAGE
 
-# ---------------- START UI ----------------
+# ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = (
-        "🎮 GOOD DAY BOSSING!\n\n"
-        "Gusto mo ba HourGuide ngayon?\n\n"
-        "👇 Pili ka provider"
+    await update.message.reply_text(
+        "🎮 GOOD DAY BOSSING!\n\nChoose provider 👇",
+        reply_markup=menu()
     )
-    await update.message.reply_text(text, reply_markup=menu())
 
 # ---------------- BUTTON HANDLER ----------------
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -91,45 +129,44 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     data = q.data
 
-    # ---------------- SEARCH MODE ----------------
+    # SEARCH MODE
     if data == "search":
         await q.edit_message_text("🔍 Send game name in chat.")
         return
 
-    # ---------------- PROVIDER ----------------
-    if data.startswith("prov_"):
-        provider = data.replace("prov_", "")
+    # PROVIDER
+    if data in games:
         page = 0
+        items, _ = paginate(games[data], page)
+        maxp = max_page(data)
 
-        items, _ = paginate(games[provider], page)
-        maxp = max_page(provider)
-
-        msg = f"🌐 {CANVA_LINK}\n\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
+        msg = f"🌐 {CANVA_LINK}\n📩 {SUPPORT}\n\n🎰 {data}\n\n"
 
         for g in items:
             msg += f"🎮 {g}\n🕐 {get_time()}\n👉 {CASINO_LINK}\n\n"
 
         kb = [
             [
-                InlineKeyboardButton("⬅️", callback_data=f"page_{provider}_{page-1}"),
+                InlineKeyboardButton("⬅️", callback_data=f"page_{data}_{page-1}"),
                 InlineKeyboardButton(f"{page+1}/{maxp+1}", callback_data="noop"),
-                InlineKeyboardButton("➡️", callback_data=f"page_{provider}_{page+1}")
+                InlineKeyboardButton("➡️", callback_data=f"page_{data}_{page+1}")
             ],
-            [InlineKeyboardButton("🔄 Refresh", callback_data=f"prov_{provider}")],
+            [InlineKeyboardButton("🔄 Refresh", callback_data=data)],
             [InlineKeyboardButton("🏠 Menu", callback_data="menu")]
         ]
 
         await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
+        return
 
-    # ---------------- PAGINATION ----------------
-    elif data.startswith("page_"):
+    # PAGINATION
+    if data.startswith("page_"):
         _, provider, page = data.split("_")
         page = int(page)
 
         items, _ = paginate(games[provider], page)
         maxp = max_page(provider)
 
-        msg = f"🌐 {CANVA_LINK}\n\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
+        msg = f"🌐 {CANVA_LINK}\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
 
         for g in items:
             msg += f"🎮 {g}\n🕐 {get_time()}\n👉 {CASINO_LINK}\n\n"
@@ -140,16 +177,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton(f"{page+1}/{maxp+1}", callback_data="noop"),
                 InlineKeyboardButton("➡️", callback_data=f"page_{provider}_{page+1}")
             ],
-            [InlineKeyboardButton("🔄 Refresh", callback_data=f"prov_{provider}")],
+            [InlineKeyboardButton("🔄 Refresh", callback_data=provider)],
             [InlineKeyboardButton("🏠 Menu", callback_data="menu")]
         ]
 
         await q.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb))
+        return
 
-    elif data == "menu":
+    if data == "menu":
         await q.edit_message_text("🏠 MAIN MENU", reply_markup=menu())
 
-# ---------------- SEARCH FUNCTION ----------------
+# ---------------- SEARCH ----------------
 async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     txt = update.message.text.lower()
 
@@ -168,4 +206,5 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text))
+
 app.run_polling()
