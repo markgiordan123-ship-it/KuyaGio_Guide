@@ -63,6 +63,8 @@ def get_msg(provider,lang):
 
 # --- TELEGRAM HANDLERS ---
 async def start(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    uid = update.message.from_user.id
+    user_lang[uid] = None  # reset language each start
     kb = [[InlineKeyboardButton("English",callback_data="lang_EN"),
            InlineKeyboardButton("Tagalog",callback_data="lang_TL")]]
     await update.message.reply_text("Choose your language / Piliin ang wika:",reply_markup=InlineKeyboardMarkup(kb))
@@ -88,12 +90,12 @@ async def button(update:Update,context:ContextTypes.DEFAULT_TYPE):
         prov = data.split("_")[1]
         lang = user_lang.get(uid,"EN")
         msg = get_msg(prov,lang)
-        # Add "HourGuide" button to let user see other games again
+        # HourGuide button lets user refresh the provider
         kb = [[InlineKeyboardButton("HourGuide 🔄",callback_data=f"prov_{prov}")]]
         await q.edit_message_text(msg,reply_markup=InlineKeyboardMarkup(kb))
 
 async def text(update:Update,context:ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Please use the buttons to select language and provider.")
+    await update.message.reply_text("Please use /start to begin.")
 
 # --- MAIN ---
 app = ApplicationBuilder().token(TOKEN).build()
