@@ -22,33 +22,56 @@ def anti_spam(user_id):
     cooldown[user_id] = now
     return False
 
+# ---------------- PROVIDERS ----------------
+providers = ["JILI","PG","PRAGMATIC","FA CHAI","BNG","JDB","YELLOW BAT","CO9"]
+
+# ---------------- AUTO GENERATE 50 GAMES EACH ----------------
+def generate_games(prefix):
+    return [f"{prefix} GAME {i+1}" for i in range(50)]
+
 games = {
-    "JILI": ["SUPER ACE", "GOLDEN EMPIRE", "BOXING KING"],
-    "PG": ["Mahjong Ways", "Lucky Neko", "Fortune Tiger"],
-    "PRAGMATIC": ["Sweet Bonanza", "Gates of Olympus", "Sugar Rush"]
+    "JILI": generate_games("JILI"),
+    "PG": generate_games("PG"),
+    "PRAGMATIC": generate_games("PRAG"),
+    "FA CHAI": generate_games("FCH"),
+    "BNG": generate_games("BNG"),
+    "JDB": generate_games("JDB"),
+    "YELLOW BAT": generate_games("YBAT"),
+    "CO9": generate_games("CO9")
 }
 
+# ---------------- MENU ----------------
 def menu():
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎰 JILI", callback_data="JILI"),
-         InlineKeyboardButton("🎲 PG", callback_data="PG")],
-        [InlineKeyboardButton("🔥 PRAGMATIC", callback_data="PRAGMATIC")]
-    ])
+    buttons = []
+    row = []
 
+    for i, p in enumerate(providers):
+        row.append(InlineKeyboardButton(p, callback_data=p))
+
+        if len(row) == 2:
+            buttons.append(row)
+            row = []
+
+    if row:
+        buttons.append(row)
+
+    return InlineKeyboardMarkup(buttons)
+
+# ---------------- TIME ----------------
 def get_time():
     now = datetime.now(PH)
     start = now + timedelta(minutes=random.randint(0, 20))
     end = start + timedelta(minutes=30)
     return f"{start.strftime('%I:%M %p')} - {end.strftime('%I:%M %p')}"
 
+# ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = (
-        "🎮 GOOD DAY BOSSING!\n\n"
-        "Gusto mo ba HourGuide ngayon?\n\n"
-        "👇 Pili ka provider"
+    await update.message.reply_text(
+        "🎮 GOOD DAY BOSSING!\n\nSelect provider 👇",
+        reply_markup=menu()
     )
-    await update.message.reply_text(text, reply_markup=menu())
 
+# ---------------- BUTTON ----------------
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
@@ -59,18 +82,20 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     provider = q.data
 
     if provider in games:
-        text = f"🌐 {CANVA_LINK}\n\n📩 {SUPPORT}\n\n🎰 {provider}\n\n"
+        text = f"🎰 {provider}\n\n📘 {CANVA_LINK}\n📩 {SUPPORT}\n\n"
+
         for g in games[provider]:
             text += f"🎮 {g}\n🕐 {get_time()}\n👉 {CASINO_LINK}\n\n"
 
         await q.edit_message_text(text, reply_markup=menu())
 
+# ---------------- TEXT ----------------
 async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Use buttons only 👇", reply_markup=menu())
 
+# ---------------- RUN ----------------
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text))
-
 app.run_polling()
