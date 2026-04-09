@@ -12,7 +12,6 @@ if not TOKEN:
 # ---------------- LINKS ----------------
 CANVA_LINK = "https://kuyagiometerguide.my.canva.site/"
 CASINO_LINK = "https://example.com"
-ADMIN_USERNAME = "kuyagiopaldo"
 
 PH = timezone(timedelta(hours=8))
 
@@ -26,15 +25,22 @@ def anti_spam(uid):
     cooldown[uid] = now
     return False
 
-# ---------------- 50 GAMES EACH PROVIDER ----------------
+# ---------------- GAME DATA ----------------
 games = {
-
-"JILI": [
-"Super Ace","Golden Empire","Boxing King","Crazy777","Money Coming","Lucky Jaguar",
+"JILI": ["Super Ace","Golden Empire","Boxing King","Crazy777","Money Coming","Lucky Jaguar",
 "Fortune Gems","Wild Ace","Golden Bank 2","Shogun","3 Lucky Pigs","3 Coin Treasures",
 "Nightfall Hunting","Money Pot","Fruity Wheel","Aztec Priestess","Bangla Beauty",
 "Go For Champion","Egypt Glow","Magic Lamp","Night City","Legacy of Egypt",
 "Pirate Queen","Golden Temple","Jackpot Joker","Candy Baby","Mines Gold",
+"Lucky Goldbricks","Bonus Hunter","Party Star","King Arthur","War Dragons",
+"Book of Gold","Sweet Land","Boxing Extravaganza","Sin City","Golden Bank",
+"Pharaoh Treasure","Witches Night","Arena Fighter","Lucky Doggy","Fortune Tree",
+"Bone Fortune","Golden Queen","Master Tiger","Jungle King","Samba","Golden Joker"],
+
+"PG": ["Mahjong Ways 1","Mahjong Ways 2","Lucky Neko","Fortune Tiger","Dragon Hatch",
+"Wild Bandito","Treasures of Aztec","Ganesha Gold","Medusa","Symbol of Egypt",
+"Hood vs Wolf","Rooster Rumble","Win Win Fish","Garuda Gems","Bikini Paradise",
+"Double Fortune","Crypto Gold","Dragon Legend","Candy"Pirate Queen","Golden Temple","Jackpot Joker","Candy Baby","Mines Gold",
 "Lucky Goldbricks","Bonus Hunter","Party Star","King Arthur","War Dragons",
 "Book of Gold","Sweet Land","Boxing Extravaganza","Sin City","Golden Bank",
 "Pharaoh Treasure","Witches Night","Arena Fighter","Lucky Doggy","Fortune Tree",
