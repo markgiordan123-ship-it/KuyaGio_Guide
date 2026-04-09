@@ -42,3 +42,22 @@ async def button(update:Update,context:ContextTypes.DEFAULT_TYPE):
     uid = q.from_user.id
     global saved_date
     if d.startswith("lang_"):
+        user_lang[uid] = d.split("_")[1]
+        kb = [[InlineKeyboardButton(p,callback_data=f"prov_{p}")] for p in games.keys()]
+        await q.edit_message_text("Select provider:" if user_lang[uid]=="EN" else "Pumili ng provider:",reply_markup=InlineKeyboardMarkup(kb))
+    elif d.startswith("prov_"):
+        prov = d.split("_")[1]
+        lang = user_lang.get(uid,"EN")
+        today = str(date.today())
+        if today != saved_date: gen_daily(); saved_date = today
+        await q.edit_message_text(get_msg(prov,lang))
+
+async def text(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Please use the buttons to select language and provider.")
+
+# --- MAIN ---
+app = ApplicationBuilder().token(TOKEN).build()
+app.add_handler(CommandHandler("start",start))
+app.add_handler(CallbackQueryHandler(button))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,text))
+app.run_polling()
