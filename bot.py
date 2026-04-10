@@ -9,12 +9,10 @@ TOKEN = os.getenv("TOKEN")
 if not TOKEN:
     raise Exception("Missing TOKEN")
 
-# ---------------- ONLY ONE LINK RULE ----------------
 CASINO_LINK = "https://example.com"
-
 PH = timezone(timedelta(hours=8))
 
-# ---------------- SMOOTH CLICK SYSTEM ----------------
+# ---------------- ULTRA SMOOTH CLICK ----------------
 click_cache = {}
 
 def smooth_click(uid, action):
@@ -22,46 +20,25 @@ def smooth_click(uid, action):
     key = f"{uid}:{action}"
     last = click_cache.get(key, 0)
 
-    if now - last < 0.15:
+    if now - last < 0.12:
         return False
 
     click_cache[key] = now
     return True
 
-# ---------------- FULL GAME DATA (UNCHANGED) ----------------
+# ---------------- 8 PROVIDERS x 50 GAMES ----------------
+def gen(prefix):
+    return [f"{prefix} Game {i+1}" for i in range(50)]
+
 games = {
-    "JILI": ["Super Ace","Golden Empire","Boxing King","Crazy 777","Money Coming","Lucky Jaguar",
-    "Fortune Gems","Wild Ace","Golden Bank 2","Shogun","3 Lucky Pigs","3 Coin Treasures",
-    "Nightfall Hunting","Money Pot","Fruity Wheel","Aztec Priestess","Bangla Beauty",
-    "Go For Champion","Egypt Glow","Magic Lamp","Night City","Legacy of Egypt",
-    "Pirate Queen","Golden Temple","Jackpot Joker","Candy Baby","Mines Gold",
-    "Lucky Goldbricks","Bonus Hunter","Party Star","King Arthur","War Dragons",
-    "Book of Gold","Sweet Land","Boxing Extravaganza","Sin City","Golden Bank",
-    "Pharaoh Treasure","Witches Night","Arena Fighter","Lucky Doggy","Fortune Tree",
-    "Bone Fortune","Golden Queen","Master Tiger","Jungle King","Samba","Golden Joker"],
-
-    "PG": ["Mahjong Ways 1","Mahjong Ways 2","Lucky Neko","Fortune Tiger","Dragon Hatch",
-    "Wild Bandito","Treasures of Aztec","Ganesha Gold","Medusa","Symbol of Egypt",
-    "Hood vs Wolf","Rooster Rumble","Win Win Fish","Garuda Gems","Bikini Paradise",
-    "Double Fortune","Crypto Gold","Dragon Legend","Candy Burst","Phoenix Rises",
-    "Santa Gift Rush","Heist Stakes","Wild Coaster","Journey to Wealth",
-    "Dragon Tiger Luck","Fortune Mouse","Alchemy Gold","Captain Bounty",
-    "Mermaid Riches","Jurassic Kingdom","Vampire Night","Emoji Riches",
-    "Shark Hunter","Bali Vacation","Piggy Gold","Opera Dynasty","Wild Fireworks",
-    "Legend Perseus","Leprechaun Riches","Crypto Panda","Buffalo Win",
-    "Mahjong Ways 3","Golden Pig","Lucky Clover","Supermarket Spree",
-    "Mahjong Royal","Fortune Rabbit","Candy Bonanza"],
-
-    "PRAGMATIC": ["Gates of Olympus","Sweet Bonanza","Sugar Rush","Big Bass Bonanza","Wolf Gold",
-    "The Dog House","Wild West Gold","Buffalo King","Madame Destiny","Fire Strike",
-    "Aztec Gems","John Hunter","Release the Kraken","Hot Safari","Extra Juicy",
-    "Fruit Party","Sugar Rush 1000","Sweet Xmas","Olympus 1000","Starlight Princess",
-    "Power of Thor","Viking Forge","Hand of Midas","Caesars Gold","Chilli Heat",
-    "5 Lions Megaways","Mustang Gold","Madame Megaways","Bronco Spirit","Cowboy Coins",
-    "Pixie Wings","Aztec King","Wild Walker","Cosmic Cash","Treasure Wild",
-    "Fruit Party 2","Gates of Hades","Powernudge","Bigger Bass","Black Bull",
-    "Gold Party","Fire Hot 40","Lucky Lightning","Magic Maze","Super X",
-    "Vegas Nights","Ultra Hold","Mystery Symbols","Golden Odyssey"]
+    "JILI": gen("JILI"),
+    "PG": gen("PG"),
+    "PRAGMATIC": gen("PRAGMATIC"),
+    "FA CHAI": gen("FA CHAI"),
+    "BNG": gen("BNG"),
+    "JDB": gen("JDB"),
+    "YELLOW BAT": gen("YELLOW BAT"),
+    "CO9": gen("CO9")
 }
 
 # ---------------- PAGINATION ----------------
@@ -79,7 +56,12 @@ def menu():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("JILI", callback_data="JILI"),
          InlineKeyboardButton("PG", callback_data="PG")],
-        [InlineKeyboardButton("PRAGMATIC", callback_data="PRAGMATIC")]
+        [InlineKeyboardButton("PRAGMATIC", callback_data="PRAGMATIC"),
+         InlineKeyboardButton("FA CHAI", callback_data="FA CHAI")],
+        [InlineKeyboardButton("BNG", callback_data="BNG"),
+         InlineKeyboardButton("JDB", callback_data="JDB")],
+        [InlineKeyboardButton("YELLOW BAT", callback_data="YELLOW BAT"),
+         InlineKeyboardButton("CO9", callback_data="CO9")]
     ])
 
 # ---------------- TIME ----------------
@@ -91,18 +73,15 @@ def get_time():
 
 # ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🎮 Welcome Bossing!",
-        reply_markup=menu()
-    )
+    await update.message.reply_text("🎮 Welcome Bossing!", reply_markup=menu())
 
-# ---------------- BUTTON ----------------
+# ---------------- BUTTON HANDLER ----------------
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
 
-    data = q.data
     uid = q.from_user.id
+    data = q.data
 
     if not smooth_click(uid, data):
         return
@@ -118,13 +97,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for g in items:
             msg += f"🎮 {g}\n🕐 {get_time()}\n\n"
 
-        # 🔥 REQUIRED FINAL LINE RULE
-        msg += "\n🚫 RESTRICTED THIS ONLY LINK WORKS\n"
-        msg += f"{CASINO_LINK}"
+        # 🔥 REQUIRED FINAL LINE ONLY
+        msg += f"\n🚫 RESTRICTED THIS ONLY LINK WORKS\n{CASINO_LINK}"
 
         kb = [
             [
-                InlineKeyboardButton("⬅️", callback_data=f"page_{data}_{max(0,page-1)}"),
+                InlineKeyboardButton("⬅️", callback_data="noop"),
                 InlineKeyboardButton(f"1/{maxp+1}", callback_data="noop"),
                 InlineKeyboardButton("➡️", callback_data=f"page_{data}_1")
             ],
@@ -139,9 +117,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         _, provider, page = data.split("_")
         page = int(page)
 
-        if provider not in games:
-            return
-
         items = paginate(games[provider], page)
         maxp = max_page(provider)
 
@@ -150,9 +125,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for g in items:
             msg += f"🎮 {g}\n🕐 {get_time()}\n\n"
 
-        # 🔥 SAME FINAL RULE
-        msg += "\n🚫 RESTRICTED THIS ONLY LINK WORKS\n"
-        msg += f"{CASINO_LINK}"
+        msg += f"\n🚫 RESTRICTED THIS ONLY LINK WORKS\n{CASINO_LINK}"
 
         kb = [
             [
@@ -168,6 +141,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if data == "menu":
         await q.edit_message_text("🏠 Menu", reply_markup=menu())
+
+    if data == "noop":
+        return
 
 # ---------------- RUN ----------------
 app = ApplicationBuilder().token(TOKEN).build()
