@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
+# ---------------- TOKEN ----------------
 TOKEN = os.getenv("TOKEN")
 if not TOKEN:
     raise Exception("Missing TOKEN")
@@ -13,64 +14,69 @@ CANVA_LINK = "https://kuyagiometerguide.my.canva.site/"
 
 PH = timezone(timedelta(hours=8))
 
-# ---------------- CLICK PROTECTION ----------------
+# ---------------- FAST CLICK SYSTEM ----------------
 click_cache = {}
 
-def smooth_click(uid, action):
+def fast_click(uid, action):
     now = time.time()
     key = f"{uid}:{action}"
-    last = click_cache.get(key, 0)
-    if now - last < 0.12:
+    if now - click_cache.get(key, 0) < 0.08:
         return False
     click_cache[key] = now
     return True
 
-# ---------------- REAL GAMES (50 EACH) ----------------
+# ---------------- REAL GAMES (50 EACH PROVIDER) ----------------
 games = {
 "JILI": [
-"Super Ace","Golden Empire","Boxing King","Money Coming","Lucky Jaguar","Fortune Gems","Wild Ace",
-"Golden Bank 2","Shogun","Nightfall Hunting","Money Pot","Fruity Wheel","Aztec Priestess",
-"Go For Champion","Magic Lamp","Legacy of Egypt","Pirate Queen","Golden Temple","Jackpot Joker",
-"Candy Baby","Mines Gold","Lucky Goldbricks","Bonus Hunter","Party Star","King Arthur",
-"War Dragons","Book of Gold","Sweet Land","Sin City","Golden Queen","Master Tiger",
-"Jungle King","Samba","Golden Joker","Fortune Tree","Lucky Doggy","Arena Fighter",
-"Pharaoh Treasure","Witches Night","Bone Fortune","Dragon Treasure","Royal Gold",
-"Mega Fortune","Wild Spin","Cash Mania","Gold Rush","Temple Run","Mystic Gems",
-"Fortune Spin","Dragon Rise"
+"Super Ace","Golden Empire","Boxing King","Money Coming","Lucky Jaguar","Fortune Gems",
+"Wild Ace","Golden Bank 2","Shogun","Nightfall Hunting","Money Pot","Fruity Wheel",
+"Aztec Priestess","Go For Champion","Magic Lamp","Legacy of Egypt","Pirate Queen",
+"Golden Temple","Jackpot Joker","Candy Baby","Mines Gold","Lucky Goldbricks",
+"Bonus Hunter","Party Star","King Arthur","War Dragons","Book of Gold","Sweet Land",
+"Sin City","Golden Queen","Master Tiger","Jungle King","Samba","Golden Joker",
+"Fortune Tree","Lucky Doggy","Arena Fighter","Pharaoh Treasure","Witches Night",
+"Bone Fortune","Dragon Treasure","Royal Gold","Mega Fortune","Wild Spin",
+"Cash Mania","Gold Rush","Temple Run","Mystic Gems","Fortune Spin","Dragon Rise"
 ],
 
 "PG 🎰": [
 "Mahjong Ways","Mahjong Ways 2","Lucky Neko","Fortune Tiger","Dragon Hatch","Wild Bandito",
-"Treasures of Aztec","Ganesha Gold","Medusa","Symbol of Egypt","Hood vs Wolf","Rooster Rumble",
-"Win Win Fish","Garuda Gems","Bikini Paradise","Double Fortune","Dragon Legend","Candy Burst",
-"Phoenix Rises","Heist Stakes","Wild Coaster","Journey to Wealth","Fortune Mouse","Alchemy Gold",
-"Captain Bounty","Mermaid Riches","Jurassic Kingdom","Vampire Night","Emoji Riches","Shark Hunter",
-"Piggy Gold","Opera Dynasty","Wild Fireworks","Leprechaun Riches","Buffalo Win","Mahjong Royal",
-"Fortune Rabbit","Candy Bonanza","Dragon Fortune","Lucky Clover","Golden Pig","Supermarket Spree",
-"Crypto Panda","Legend Perseus","Wild Ape","Dragon Master","Lucky Spin","Ocean King","Moon Princess","Golden Era"
+"Treasures of Aztec","Ganesha Gold","Medusa","Symbol of Egypt","Hood vs Wolf",
+"Rooster Rumble","Win Win Fish","Garuda Gems","Bikini Paradise","Double Fortune",
+"Dragon Legend","Candy Burst","Phoenix Rises","Heist Stakes","Wild Coaster",
+"Journey to Wealth","Fortune Mouse","Alchemy Gold","Captain Bounty","Mermaid Riches",
+"Jurassic Kingdom","Vampire Night","Emoji Riches","Shark Hunter","Piggy Gold",
+"Opera Dynasty","Wild Fireworks","Leprechaun Riches","Buffalo Win","Mahjong Royal",
+"Fortune Rabbit","Candy Bonanza","Dragon Fortune","Lucky Clover","Golden Pig",
+"Supermarket Spree","Crypto Panda","Legend Perseus","Wild Ape","Dragon Master",
+"Lucky Spin","Ocean King","Moon Princess","Golden Era"
 ],
 
 "PRAGMATIC 🎲": [
-"Gates of Olympus","Sweet Bonanza","Sugar Rush","Big Bass Bonanza","Wolf Gold","The Dog House",
-"Wild West Gold","Buffalo King","Madame Destiny","Fire Strike","Aztec Gems","John Hunter",
-"Release the Kraken","Hot Safari","Fruit Party","Starlight Princess","Power of Thor","Viking Forge",
-"Hand of Midas","Chilli Heat","5 Lions Megaways","Mustang Gold","Madame Megaways","Bronco Spirit",
-"Cowboy Coins","Pixie Wings","Wild Walker","Cosmic Cash","Treasure Wild","Gates of Hades",
-"Powernudge","Bigger Bass","Black Bull","Gold Party","Lucky Lightning","Magic Maze",
-"Super X","Vegas Nights","Ultra Hold","Mystery Symbols","Golden Odyssey","Fire Hot",
-"Sugar Rush 1000","Sweet Bonanza Xmas","Fruit Party 2","Rise of Olympus","Book of Golden Sands",
-"Pyramid King","Buffalo King MegaWays","Dragon Gold"
+"Gates of Olympus","Sweet Bonanza","Sugar Rush","Big Bass Bonanza","Wolf Gold",
+"The Dog House","Wild West Gold","Buffalo King","Madame Destiny","Fire Strike",
+"Aztec Gems","John Hunter","Release the Kraken","Hot Safari","Fruit Party",
+"Starlight Princess","Power of Thor","Viking Forge","Hand of Midas","Chilli Heat",
+"5 Lions Megaways","Mustang Gold","Madame Megaways","Bronco Spirit","Cowboy Coins",
+"Pixie Wings","Wild Walker","Cosmic Cash","Treasure Wild","Gates of Hades",
+"Powernudge","Bigger Bass","Black Bull","Gold Party","Lucky Lightning",
+"Magic Maze","Super X","Vegas Nights","Ultra Hold","Mystery Symbols",
+"Golden Odyssey","Fire Hot","Sugar Rush 1000","Sweet Bonanza Xmas",
+"Fruit Party 2","Rise of Olympus","Book of Golden Sands","Pyramid King",
+"Buffalo King MegaWays","Dragon Gold"
 ],
 
 "FA CHAI 🐉": [
-"Golden Dragon","Lucky Panda","Money Tree","Fortune Festival","Dragon Fortune","Red Packet Rush",
-"Prosperity Tiger","Fortune Ox","Golden Bamboo","Lucky Phoenix","Dragon Wealth","Imperial Gold",
-"Fortune Emperor","Lucky Zodiac","Golden Dynasty","Red Dragon Rise","Mandarin Treasure",
-"Asia Fortune","Golden Asia","Spring Festival","Lucky Harvest","Fortune Bloom","Golden Panda",
-"Money Rain","Red Lantern","Dragon Blessing","Imperial Fortune","Golden Wheel","Lucky Spin",
-"Fortune Cloud","Asia Star","Golden Festival","Prosperity Spin","Lucky Red","Dragon Prosperity",
-"Golden Path","Money Luck","Fortune King","Red Path","Asia Win","Golden Tiger","Lucky Empire",
-"Fortune Rise","Dragon Light","Golden Temple Asia","Lucky Fortune 2","Prosperity Gold","Dragon Coin","Golden Flow","Money Empire"
+"Golden Dragon","Lucky Panda","Money Tree","Fortune Festival","Dragon Fortune",
+"Red Packet Rush","Prosperity Tiger","Fortune Ox","Golden Bamboo","Lucky Phoenix",
+"Dragon Wealth","Imperial Gold","Fortune Emperor","Lucky Zodiac","Golden Dynasty",
+"Red Dragon Rise","Mandarin Treasure","Asia Fortune","Golden Asia","Spring Festival",
+"Lucky Harvest","Fortune Bloom","Golden Panda","Money Rain","Red Lantern",
+"Dragon Blessing","Imperial Fortune","Golden Wheel","Lucky Spin","Fortune Cloud",
+"Asia Star","Golden Festival","Prosperity Spin","Lucky Red","Dragon Prosperity",
+"Golden Path","Money Luck","Fortune King","Red Path","Asia Win","Golden Tiger",
+"Lucky Empire","Fortune Rise","Dragon Light","Golden Temple Asia","Lucky Fortune 2",
+"Prosperity Gold","Dragon Coin","Golden Flow","Money Empire"
 ],
 
 "BNG 🌊": [
@@ -81,7 +87,8 @@ games = {
 "Lucky Fishing","Dragon Ocean","Pirate Catch","Sea Battle","Ocean Storm","Fish Master",
 "Deep Gold","Ocean Win","Golden Reef","Sea Treasure","Fishing Storm","Ocean Hunter",
 "Mega Sea","Lucky Ocean","Fish Bonanza","Sea Fortune","Ocean Gold","Golden Catch",
-"Deep King","Sea Power","Fish Rich","Ocean X","Golden Sea","Lucky Reef","Fishing Empire","Ocean Pro"
+"Deep King","Sea Power","Fish Rich","Ocean X","Golden Sea","Lucky Reef",
+"Fishing Empire","Ocean Pro"
 ],
 
 "JDB 💎": [
@@ -90,9 +97,10 @@ games = {
 "Dragon Spin","Gold Party","Wild Circus","Candy Spin","Dragon Fire","Money Blast",
 "Golden Rush","Super Boom","Lucky Machine","Spin Master","Mega Circus","Dragon Gold Spin",
 "Wild Boom","Hot Candy","Fire Fortune","Dragon Empire","Money Dragon","Golden Storm",
-"Fire Spin","Candy World","Lucky Explosion","Fortune Machine","Mega Dragon","Super Gold",
-"Fire Jackpot","Lucky Dragon","Golden Blast","Money Spin","Fortune X","Mega Candy",
-"Super Empire","Dragon Win","Golden Fire","Lucky Boom","Spin King","Fire Wheel","Money Rush","Dragon Force"
+"Fire Spin","Candy World","Lucky Explosion","Fortune Machine","Mega Dragon",
+"Super Gold","Fire Jackpot","Lucky Dragon","Golden Blast","Money Spin","Fortune X",
+"Mega Candy","Super Empire","Dragon Win","Golden Fire","Lucky Boom",
+"Spin King","Fire Wheel","Money Rush","Dragon Force"
 ],
 
 "YELLOW BAT 🦇": [
@@ -103,7 +111,8 @@ games = {
 "Lucky Wings","Bat Legend","Golden Shadow","Night Fury","Bat Power","Vampire Spin",
 "Shadow Empire","Golden King","Neon Bat","Night Wings","Bat Win","Shadow Gold",
 "Vampire Empire","Golden Fury","Dark Bat","Neon Spin","Midnight Gold","Lucky Shadow",
-"Bat Pro","Shadow Rush","Bat Mega","Neon Win","Golden Vampire","Night King","Bat Storm X","Shadow Rise"
+"Bat Pro","Shadow Rush","Bat Mega","Neon Win","Golden Vampire","Night King",
+"Bat Storm X","Shadow Rise"
 ],
 
 "CO9 ⚡": [
@@ -112,9 +121,10 @@ games = {
 "CO9 Empire","Dragon Fortune","Gold Storm","Lucky Wheel","Mega Spin","Fire Dragon",
 "Golden Path","Money Rush","CO9 Jackpot","Wild Spin","Fortune Gold","Dragon Gold",
 "Lucky Star","Golden Blast","Mega Fortune","Spin Empire","Power Win","Fire Fortune",
-"Golden Spin","Lucky Rush","Dragon King","Wild Gold Spin","Fortune Empire","Mega Dragon",
-"Super Win","Golden Wheel","Lucky Blast","Fire Spin","Money King","Dragon Spin",
-"Gold Fortune","Rush X","Mega Gold","Empire Spin","Spin Master","Wheel X","Fortune Pro","CO9 Max"
+"Golden Spin","Lucky Rush","Dragon King","Wild Gold Spin","Fortune Empire",
+"Mega Dragon","Super Win","Golden Wheel","Lucky Blast","Fire Spin","Money King",
+"Dragon Spin","Gold Fortune","Rush X","Mega Gold","Empire Spin","Spin Master",
+"Wheel X","Fortune Pro","CO9 Max"
 ]
 }
 
@@ -141,7 +151,7 @@ def get_time():
 # ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🎮 GOOD DAY BOSSING! 😎\nChoose your provider below 👇",
+        "🎮 GOOD DAY BOSSING 😎\nChoose your provider below 👇",
         reply_markup=menu()
     )
 
@@ -153,13 +163,20 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = q.data
     uid = q.from_user.id
 
-    if not smooth_click(uid, data):
+    if not fast_click(uid, data):
         return
 
     if data in games:
+        page = 0
+        per_page = 10
+
+        start = page * per_page
+        end = start + per_page
+        items = games[data][start:end]
+
         msg = f"🎰 {data}\n\n"
 
-        for g in games[data][:10]:
+        for g in items:
             msg += f"{g}\n🕐 {get_time()}\n\n"
 
         msg += (
@@ -180,4 +197,4 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(button))
 
-app.run_polling()
+app.run_polling() 
